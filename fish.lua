@@ -1,15 +1,14 @@
+--options
+local mintime = 1
+local maxtime = 5
+local animation_offset = 0x1E0
+--/options
+
+
 local PlayerGuid = UnitGUID("player")
 local PlayerObject = ObjectPointer("player")
 
 SLASH_fish = '/fish'
-
-local function GetLatency()
-	return select(4, GetNetStats())
-end
-
-local function Sleep(Interval)
-	FishUntil = GetTime() + (Interval / 1000)
-end
 
 local function spelltoName(spellID)
 	return tostring(select(1,GetSpellInfo(spellID)))
@@ -25,8 +24,6 @@ local function getBobber()
 		local ObjectName = ObjectName(ObjectPointer(Object))
 
 		if ObjectName == BobberName then
-				--print("bobber found !!")
-				--print(ObjectField(Object,0x1E0,SInt))
 				return Object
 		end
 
@@ -34,7 +31,7 @@ local function getBobber()
 end
 
 local function isBobbing()
-	local bobbing = ObjectField(getBobber(),0x1E0,SInt)
+	local bobbing = ObjectField(getBobber(),animation_offset,SInt)
 	if bobbing == 1 then
 		return true
 	else
@@ -48,8 +45,6 @@ local function goFish()
 		if isBobbing() == true then
 			print("|cffff6060[|r|cFF00FFFFFishbot|cffff6060]|r I got a fish !")
 			ObjectInteract(getBobber())
-		else
-			--print("not bobbing")
 		end
 	else
 		CastSpellByName(spelltoName(131474))
@@ -61,7 +56,7 @@ local BobberFrame = CreateFrame("FRAME", "FishingFrame")
  BobberFrame:SetScript("OnUpdate", function(self, elapsed)
      if self.TimeSinceLastUpdate == nil then self.TimeSinceLastUpdate = 0 end
      self.TimeSinceLastUpdate = self.TimeSinceLastUpdate + elapsed
-     if (self.TimeSinceLastUpdate > 0.2) and enabled == 1 then
+     if (self.TimeSinceLastUpdate > math.random(mintime,maxtime)) and enabled == 1 then
 		 goFish()
          self.TimeSinceLastUpdate = 0
    	 end
